@@ -16,7 +16,7 @@ This is a basic implementation of a WorldEdit-like plugin for the Endstone Minec
     이 명령어는 `dist` 폴더 안에 `.whl` 파일을 생성합니다. 이 파일이 Endstone 플러그인입니다.
 
 2.  **플러그인 설치:**
-    생성된 `.whl` 파일 (예: `dist/worldedit-0.1.0-py3-none-any.whl`)을 Endstone 서버의 `plugins` 폴더로 복사하거나 이동시킵니다.
+    생성된 `.whl` 파일 (예: `dist/worldedit-0.1.0-py3-none-any.whl`)을 Endstone 서버의 `plugins` 폴더로 복사하거나 이동시킵니다. 또는 최신 릴리스에서 다운로드하세요.
 
 3.  **서버 재시작:**
     Endstone 서버를 시작하거나 재시작하면 플러그인이 자동으로 로드됩니다.
