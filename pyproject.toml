@@ -1,0 +1,17 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "endstone-worldedit"
+version = "0.1.0"
+description = "A WorldEdit-like plugin for Endstone."
+authors = [
+    { name = "Your Name", email = "your@email.com" }
+]
+dependencies = [
+    "endstone"
+]
+
+[project.entry-points."endstone"]
+"worldedit" = "endstone_worldedit.plugin:WorldEditPlugin"
