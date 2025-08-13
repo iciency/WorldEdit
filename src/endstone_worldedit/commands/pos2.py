@@ -9,6 +9,10 @@ command = {
 }
 
 def handler(plugin, sender, args):
+    if not sender.is_op():
+        sender.send_message("You do not have permission to use this command.")
+        return False
+
     if not isinstance(sender, Player):
         sender.send_message("This command can only be used by a player.")
         return False

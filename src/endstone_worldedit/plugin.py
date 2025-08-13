@@ -5,6 +5,7 @@ from endstone.event import (
     EventPriority,
     event_handler,
 )
+import time
 from endstone.command import Command, CommandSender
 from .commands import preloaded_commands, preloaded_handlers
 
@@ -17,6 +18,8 @@ class WorldEditPlugin(Plugin):
         super().__init__()
         self.selections = {}
         self.handlers = preloaded_handlers
+        self.interaction_cooldown = {}
+        self.history = {}
 
     def on_load(self):
         self.logger.info("WorldEditPlugin has been loaded!")
@@ -47,10 +50,17 @@ class WorldEditPlugin(Plugin):
     @event_handler(priority=EventPriority.HIGH)
     def on_player_interact(self, event: PlayerInteractEvent):
         player = event.player
+        player_uuid = player.unique_id
+        current_time = time.time()
+
+        last_interact_time = self.interaction_cooldown.get(player_uuid, 0)
+        if current_time - last_interact_time < 0.1:  # 100ms cooldown
+            return
+
         if event.action.name == "RIGHT_CLICK_BLOCK":
             item = player.inventory.item_in_main_hand
             if item is not None and item.type == "minecraft:wooden_axe":
-                player_uuid = player.unique_id
+                self.interaction_cooldown[player_uuid] = current_time
                 if player_uuid not in self.selections:
                     self.selections[player_uuid] = {}
                 block = event.block

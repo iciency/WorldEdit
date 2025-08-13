@@ -1,11 +1,10 @@
 from endstone import Player
-from endstone.block import Block
 
 command = {
-    "set": {
-        "description": "Fills the selection with a block.",
-        "usages": ["/set <block: block>"],
-        "permissions": ["worldedit.command.set"]
+    "cut": {
+        "description": "Cuts the selection and replaces it with air.",
+        "usages": ["/cut"],
+        "permissions": ["worldedit.command.cut"]
     }
 }
 
@@ -18,10 +17,6 @@ def handler(plugin, sender, args):
         sender.send_message("This command can only be used by a player.")
         return False
 
-    if not args:
-        sender.send_message("Usage: /set <block>")
-        return False
-
     player_uuid = sender.unique_id
     if player_uuid not in plugin.selections or 'pos1' not in plugin.selections[player_uuid] or 'pos2' not in plugin.selections[player_uuid]:
         sender.send_message("You must set both positions first.")
@@ -29,7 +24,7 @@ def handler(plugin, sender, args):
 
     pos1 = plugin.selections[player_uuid]['pos1']
     pos2 = plugin.selections[player_uuid]['pos2']
-    block_name = args[0]
+    block_name = "minecraft:air"
 
     plugin.history[player_uuid] = []  # Clear previous history for this player
     dimension = sender.dimension
@@ -47,5 +42,5 @@ def handler(plugin, sender, args):
                 plugin.history[player_uuid].append((x, y, z, block.type))
                 block.set_type(block_name)
     
-    sender.send_message("Area filled.")
+    sender.send_message("Selection cut.")
     return True
