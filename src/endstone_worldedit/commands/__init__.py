@@ -20,7 +20,7 @@ def preload_commands():
 
         if hasattr(module, 'command') and hasattr(module, 'handler'):
             for cmd, details in module.command.items():
-                print(f"✓ {cmd} - {details.get('description', 'No description')}")
+                print(f"+ {cmd} - {details.get('description', 'No description')}")
                 preloaded_commands[cmd] = details
                 preloaded_handlers[cmd] = module.handler
     print("\n")

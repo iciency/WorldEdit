@@ -1,4 +1,4 @@
-from endstone import Player
+from endstone_worldedit.utils import command_executor
 
 command = {
     "pos1": {
@@ -8,15 +8,8 @@ command = {
     }
 }
 
+@command_executor("pos1")
 def handler(plugin, sender, args):
-    if not sender.is_op:
-        sender.send_message("You do not have permission to use this command.")
-        return False
-
-    if not isinstance(sender, Player):
-        sender.send_message("This command can only be used by a player.")
-        return False
-
     player_uuid = sender.unique_id
     location = sender.location
     pos = (location.x, location.y, location.z)

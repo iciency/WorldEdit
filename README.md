@@ -6,9 +6,11 @@ A powerful WorldEdit-like plugin for the Endstone Minecraft server software, off
 
 -   **Selections**: Define a region using a wand or position commands.
 -   **Editing**: Fill selections with blocks (`/set`), or clear them (`/cut`).
+-   **Shape Generation**: Create solid/hollow spheres (`/sphere`, `/hsphere`) and cylinders (`/cyl`, `/hcyl`).
 -   **Clipboard**: Copy (`/copy`) and paste (`/paste`) selections.
 -   **History**: Undo (`/undo`) and redo (`/redo`) your actions.
--   **Permissions**: All commands are restricted to server operators (OP) only.
+-   **Schematics**: Save and load selections in the `.schem` (Java Edition compatible) format.
+-   **Permissions**: Fine-grained permission nodes for each command (e.g., `worldedit.command.set`).
 
 ## Installation
 
@@ -31,7 +33,7 @@ A powerful WorldEdit-like plugin for the Endstone Minecraft server software, off
 
 ## Usage
 
-**Note:** All commands require operator (OP) permissions.
+**Note:** All commands require specific permissions. By default, only server operators (OP) have these permissions. Use a permission management plugin to grant them to other players.
 
 1.  **Get the Selection Wand:**
     In the game, type the following command to get the wooden axe (the selection tool):
@@ -54,13 +56,49 @@ A powerful WorldEdit-like plugin for the Endstone Minecraft server software, off
         ```
         Example: `/set minecraft:stone`
 
+    -   **Replace Blocks:**
+        Replace all blocks of a certain type with another within the selection.
+        ```
+        /replace <from_block> <to_block>
+        ```
+        Example: `/replace minecraft:dirt minecraft:glass`
+
+    -   **Create Walls:**
+        Create walls around the outer edges of the selection.
+        ```
+        /walls <block>
+        ```
+
+    -   **Overlay Blocks:**
+        Place a layer of blocks on top of the selection.
+        ```
+        /overlay <block>
+        ```
+
     -   **Cut Blocks:**
         Remove all blocks in the selection (replaces them with air).
         ```
         /cut
         ```
 
-4.  **Use the Clipboard:**
+4.  **Generate Shapes:**
+    Create shapes at your current location.
+
+    -   **Spheres:**
+        Create a solid or hollow sphere.
+        ```
+        /sphere <block> <radius>
+        /hsphere <block> <radius>
+        ```
+
+    -   **Cylinders:**
+        Create a solid or hollow cylinder. Height is optional and defaults to 1.
+        ```
+        /cyl <block> <radius> [height]
+        /hcyl <block> <radius> [height]
+        ```
+
+5.  **Use the Clipboard:**
 
     -   **Copy:**
         Copy the blocks within the selection to your clipboard. The copy is relative to your position.
@@ -74,10 +112,31 @@ A powerful WorldEdit-like plugin for the Endstone Minecraft server software, off
         /paste
         ```
 
-5.  **Manage History:**
+6.  **Manage Schematics:**
+    Save and load structures to files.
+
+    -   **Save:**
+        Save the current selection to a `.schem` file.
+        ```
+        /schem save <name>
+        ```
+
+    -   **Load:**
+        Load a `.schem` file at your current position.
+        ```
+        /schem load <name>
+        ```
+
+    -   **List:**
+        List all available schematics.
+        ```
+        /schem list
+        ```
+
+7.  **Manage History:**
 
     -   **Undo:**
-        Revert your last action (`/set`, `/cut`, or `/paste`).
+        Revert your last action (`/set`, `/replace`, `/walls`, `/overlay`, `/cut`, `/paste`, shape generation, or `/schem load`).
         ```
         /undo
         ```

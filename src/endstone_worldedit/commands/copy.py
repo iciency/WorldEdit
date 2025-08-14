@@ -1,4 +1,4 @@
-from endstone import Player
+from endstone_worldedit.utils import command_executor
 
 command = {
     "copy": {
@@ -8,20 +8,9 @@ command = {
     }
 }
 
+@command_executor("copy", selection_required=True)
 def handler(plugin, sender, args):
-    if not sender.is_op:
-        sender.send_message("You do not have permission to use this command.")
-        return False
-
-    if not isinstance(sender, Player):
-        sender.send_message("This command can only be used by a player.")
-        return False
-
     player_uuid = sender.unique_id
-    if player_uuid not in plugin.selections or 'pos1' not in plugin.selections[player_uuid] or 'pos2' not in plugin.selections[player_uuid]:
-        sender.send_message("You must set both positions first.")
-        return False
-
     pos1 = plugin.selections[player_uuid]['pos1']
     pos2 = plugin.selections[player_uuid]['pos2']
     

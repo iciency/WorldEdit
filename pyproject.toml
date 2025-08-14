@@ -10,7 +10,8 @@ authors = [
     { name = "Your Name", email = "your@email.com" }
 ]
 dependencies = [
-    "endstone"
+    "endstone",
+    "nbtlib"
 ]
 
 [project.entry-points."endstone"]

@@ -1,4 +1,4 @@
-from endstone import Player
+from endstone_worldedit.utils import command_executor
 
 command = {
     "undo": {
@@ -8,15 +8,8 @@ command = {
     }
 }
 
+@command_executor("undo")
 def handler(plugin, sender, args):
-    if not sender.is_op:
-        sender.send_message("You do not have permission to use this command.")
-        return False
-
-    if not isinstance(sender, Player):
-        sender.send_message("This command can only be used by a player.")
-        return False
-
     player_uuid = sender.unique_id
     if player_uuid not in plugin.undo_history or not plugin.undo_history[player_uuid]:
         sender.send_message("There is nothing to undo.")

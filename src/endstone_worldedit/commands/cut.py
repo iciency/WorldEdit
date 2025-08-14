@@ -1,4 +1,4 @@
-from endstone import Player
+from endstone_worldedit.utils import command_executor
 
 command = {
     "cut": {
@@ -8,20 +8,9 @@ command = {
     }
 }
 
+@command_executor("cut", selection_required=True)
 def handler(plugin, sender, args):
-    if not sender.is_op:
-        sender.send_message("You do not have permission to use this command.")
-        return False
-
-    if not isinstance(sender, Player):
-        sender.send_message("This command can only be used by a player.")
-        return False
-
     player_uuid = sender.unique_id
-    if player_uuid not in plugin.selections or 'pos1' not in plugin.selections[player_uuid] or 'pos2' not in plugin.selections[player_uuid]:
-        sender.send_message("You must set both positions first.")
-        return False
-
     pos1 = plugin.selections[player_uuid]['pos1']
     pos2 = plugin.selections[player_uuid]['pos2']
     block_name = "minecraft:air"
@@ -36,15 +25,30 @@ def handler(plugin, sender, args):
     min_z = min(pos1[2], pos2[2])
     max_z = max(pos1[2], pos2[2])
 
+    blocks_to_change = []
     for x in range(int(min_x), int(max_x) + 1):
         for y in range(int(min_y), int(max_y) + 1):
             for z in range(int(min_z), int(max_z) + 1):
-                block = dimension.get_block_at(x, y, z)
-                undo_entry.append((x, y, z, block.type))
-                block.set_type(block_name)
+                blocks_to_change.append((x, y, z, block_name))
+
+    affected_blocks = len(blocks_to_change)
+
+    # Store undo history first
+    for x, y, z, _ in blocks_to_change:
+        block = dimension.get_block_at(x, y, z)
+        undo_entry.append((x, y, z, block.type))
 
     if player_uuid not in plugin.undo_history:
         plugin.undo_history[player_uuid] = []
     plugin.undo_history[player_uuid].append(undo_entry)
-    sender.send_message("Selection cut.")
+
+    # Execute asynchronously if the task is large
+    if affected_blocks > plugin.plugin_config["async-threshold"]:
+        plugin.tasks[player_uuid] = {"dimension": dimension, "blocks": blocks_to_change}
+        sender.send_message(f"Starting async operation for {affected_blocks} blocks...")
+    else:
+        for x, y, z, type in blocks_to_change:
+            block = dimension.get_block_at(x, y, z)
+            block.set_type(type)
+        sender.send_message(f"Operation complete ({affected_blocks} blocks affected).")
     return True
