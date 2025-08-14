@@ -120,9 +120,21 @@ class WorldEditPlugin(Plugin):
                     del self.tasks[player_uuid]
                     break
                 
-                x, y, z, block_type = blocks_to_change.pop(0)
-                block = dimension.get_block_at(x, y, z)
-                block.set_type(block_type)
+                # Unpack data, now including the data value
+                try:
+                    if not blocks_to_change:
+                        break
+                    block_data = blocks_to_change.pop(0)
+                    x, y, z, block_type, data_value = block_data
+                    block = dimension.get_block_at(x, y, z)
+                    block.set_type(block_type)
+                    if data_value is not None:
+                        block.data = data_value
+                except RuntimeError as e:
+                    player = self.server.get_player(player_uuid)
+                    if player:
+                        player.send_message(f"§cSkipped block: {block_type} ({e})§r")
+                    continue # Skip to the next block
 
     def on_command(self, sender: CommandSender, command: Command, args: list[str]) -> bool:
         if command.name in self.handlers:
