@@ -19,7 +19,9 @@ class WorldEditPlugin(Plugin):
         self.selections = {}
         self.handlers = preloaded_handlers
         self.interaction_cooldown = {}
-        self.history = {}
+        self.undo_history = {}
+        self.redo_history = {}
+        self.clipboard = {}
 
     def on_load(self):
         self.logger.info("WorldEditPlugin has been loaded!")

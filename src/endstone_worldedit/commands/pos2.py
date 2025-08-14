@@ -9,7 +9,7 @@ command = {
 }
 
 def handler(plugin, sender, args):
-    if not sender.is_op():
+    if not sender.is_op:
         sender.send_message("You do not have permission to use this command.")
         return False
 

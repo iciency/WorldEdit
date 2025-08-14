@@ -1,10 +1,10 @@
 from endstone import Player
 
 command = {
-    "cut": {
-        "description": "Cuts the selection and replaces it with air.",
-        "usages": ["/cut"],
-        "permissions": ["worldedit.command.cut"]
+    "copy": {
+        "description": "Copies the selection.",
+        "usages": ["/copy"],
+        "permissions": ["worldedit.command.copy"]
     }
 }
 
@@ -24,11 +24,10 @@ def handler(plugin, sender, args):
 
     pos1 = plugin.selections[player_uuid]['pos1']
     pos2 = plugin.selections[player_uuid]['pos2']
-    block_name = "minecraft:air"
-
-    undo_entry = []
-    plugin.redo_history[player_uuid] = []  # Clear redo history on new action
+    
     dimension = sender.dimension
+    player_location = sender.location
+    
     min_x = min(pos1[0], pos2[0])
     max_x = max(pos1[0], pos2[0])
     min_y = min(pos1[1], pos2[1])
@@ -36,15 +35,16 @@ def handler(plugin, sender, args):
     min_z = min(pos1[2], pos2[2])
     max_z = max(pos1[2], pos2[2])
 
+    blocks = []
     for x in range(int(min_x), int(max_x) + 1):
         for y in range(int(min_y), int(max_y) + 1):
             for z in range(int(min_z), int(max_z) + 1):
                 block = dimension.get_block_at(x, y, z)
-                undo_entry.append((x, y, z, block.type))
-                block.set_type(block_name)
+                relative_x = x - player_location.x
+                relative_y = y - player_location.y
+                relative_z = z - player_location.z
+                blocks.append((relative_x, relative_y, relative_z, block.type))
 
-    if player_uuid not in plugin.undo_history:
-        plugin.undo_history[player_uuid] = []
-    plugin.undo_history[player_uuid].append(undo_entry)
-    sender.send_message("Selection cut.")
+    plugin.clipboard[player_uuid] = blocks
+    sender.send_message(f"{len(blocks)} blocks copied.")
     return True
