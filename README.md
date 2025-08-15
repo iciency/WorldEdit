@@ -1,147 +1,106 @@
 # WorldEdit for Endstone
 
-A powerful WorldEdit-like plugin for the Endstone Minecraft server software, offering a suite of commands to modify the world.
+A powerful and intuitive WorldEdit-like plugin for the Endstone Minecraft server software, offering a comprehensive suite of commands to modify the world efficiently.
 
 ## Features
 
--   **Selections**: Define a region using a wand or position commands.
--   **Editing**: Fill selections with blocks (`/set`), or clear them (`/cut`).
--   **Shape Generation**: Create solid/hollow spheres (`/sphere`, `/hsphere`) and cylinders (`/cyl`, `/hcyl`).
--   **Clipboard**: Copy (`/copy`) and paste (`/paste`) selections.
--   **History**: Undo (`/undo`) and redo (`/redo`) your actions.
--   **Schematics**: Save and load selections in the `.schem` (Java Edition compatible) format.
--   **Permissions**: Fine-grained permission nodes for each command (e.g., `worldedit.command.set`).
+-   **Intuitive Selections**: Define a 3D region using a classic wand (`/wand`) or precise position commands (`/pos1`, `/pos2`).
+-   **Versatile Block Editing**: Set blocks in a region (`/set`), replace specific blocks (`/replace`), build walls (`/walls`), or drape a layer of blocks over the terrain (`/overlay`).
+-   **Advanced Clipboard**: Copy (`/copy`), cut (`/cut`), and paste (`/paste`) complex structures relative to your position.
+-   **Reliable History**: Easily undo (`/undo`) and redo (`/redo`) your actions to correct mistakes without hassle.
+-   **Procedural Generation**: Create perfect solid (`/sphere`, `/cyl`) and hollow (`/hsphere`, `/hcyl`) shapes like spheres and cylinders.
+-   **Cross-Edition Schematics**: Save and load structures to and from `.schem` files. The plugin is designed to handle compatibility between Java Edition and Bedrock Edition formats.
+-   **Flexible Configuration**: Customize plugin behavior and, most importantly, add custom block name translations via `config.json` to resolve schematic compatibility issues on the fly.
+-   **Granular Permissions**: Fine-grained permission nodes for every command (e.g., `worldedit.command.set`) for precise server management.
 
 ## Installation
 
 1.  **Build the Project:**
-    If you don't have the `build` package, install it first:
+    First, ensure you have the Python `build` package:
     ```bash
     pip install build
     ```
-    Then, build the plugin from the project's root directory (where `pyproject.toml` is located):
+    Then, build the plugin from the project's root directory:
     ```bash
     python -m build
     ```
-    This will create a `.whl` file in the `dist` folder. This is your Endstone plugin.
+    This will create a `.whl` file in the `dist/` folder.
 
 2.  **Install the Plugin:**
-    Copy or move the generated `.whl` file (e.g., `dist/endstone_worldedit-1.0.0-py3-none-any.whl`) into your Endstone server's `plugins` folder.
+    Copy the generated `.whl` file (e.g., `dist/endstone_worldedit-1.0.0-py3-none-any.whl`) into your Endstone server's `plugins/` folder.
 
 3.  **Restart the Server:**
-    Start or restart your Endstone server to load the plugin.
+    Start or restart your Endstone server to load the plugin and generate the default configuration.
 
-## Usage
+## Configuration
 
-**Note:** All commands require specific permissions. By default, only server operators (OP) have these permissions. Use a permission management plugin to grant them to other players.
+Upon first launch, the plugin will create a `config.json` file in `plugins/WorldEdit/`. This file allows you to customize the plugin's behavior.
 
-1.  **Get the Selection Wand:**
-    In the game, type the following command to get the wooden axe (the selection tool):
-    ```
-    /wand
-    ```
+**Note:** When updating the plugin to a new version, it is recommended to delete your existing `config.json` file. This allows the plugin to generate a new one with the latest default settings and translation rules.
 
-2.  **Select a Region:**
-    -   **Set Position 1 (Pos1):** With the wand in hand, **left-click** a block. A message "Position 1 set to (x, y, z)." will appear.
-    -   **Set Position 2 (Pos2):** With the wand in hand, **right-click** another block. A message "Position 2 set to (x, y, z)." will appear.
-    -   **Alternatively**, you can use the `/pos1` and `/pos2` commands to set the positions to your current location.
+```json
+{
+    "async-threshold": 5000,
+    "particle-type": "minecraft:endrod",
+    "particle-density-step": 5,
+    "schematic-path": "plugins/WorldEdit/schematics",
+    "block_translation_map": {
+        "cobblestone_stairs": "stone_stairs",
+        "rooted_dirt": "dirt",
+        "sugar_cane": "reeds",
+        "slime_block": "slime",
+        "oak_sign": "standing_sign",
+        "oak_wall_sign": "wall_sign"
+    }
+}
+```
 
-3.  **Modify the Selection:**
-    Once both positions are set, you can use the following commands:
+-   **`async-threshold`**: The number of blocks at which an operation will be processed in smaller chunks to prevent server lag.
+-   **`particle-type`**: The particle used to visualize the selection box.
+-   **`block_translation_map`**: A powerful feature for resolving compatibility issues when loading Java Edition schematics. If a schematic fails to load because a block name isn't found (e.g., Java's `minecraft:slime_block`), you can add an entry here to translate it to the correct Bedrock name (e.g., `"slime_block": "slime"`).
 
-    -   **Set Blocks:**
-        Fill the selected region with a specific block.
-        ```
-        /set <block_name>
-        ```
-        Example: `/set minecraft:stone`
+## Usage Guide
 
-    -   **Replace Blocks:**
-        Replace all blocks of a certain type with another within the selection.
-        ```
-        /replace <from_block> <to_block>
-        ```
-        Example: `/replace minecraft:dirt minecraft:glass`
+**Note:** All commands require specific permissions (e.g., `worldedit.command.wand`). By default, only server operators have these permissions.
 
-    -   **Create Walls:**
-        Create walls around the outer edges of the selection.
-        ```
-        /walls <block>
-        ```
+### 1. The Selection Wand
+First, give yourself the selection tool.
+-   **/wand** (Alias: `/w`): Gives you a wooden axe to use as the selection wand.
 
-    -   **Overlay Blocks:**
-        Place a layer of blocks on top of the selection.
-        ```
-        /overlay <block>
-        ```
+### 2. Selecting a Region
+Define the area you want to edit.
+-   **Left-Click** a block with the wand to set **Position 1**.
+-   **Right-Click** a block with the wand to set **Position 2**.
+-   **/pos1** & **/pos2**: Sets your current location as Position 1 or 2.
 
-    -   **Cut Blocks:**
-        Remove all blocks in the selection (replaces them with air).
-        ```
-        /cut
-        ```
+### 3. Editing the World
+Modify the blocks within your selection.
+-   **/set `<block>`**: Fills the entire selection with a block.
+-   **/replace `<from_block>` `<to_block>`**: Replaces all instances of one block with another.
+-   **/cut**: Deletes all blocks in the selection and copies them.
+-   **/walls `<block>`**: Builds walls on the outer edges of the selection.
+-   **/overlay `<block>`**: Places a layer of blocks on top of the highest blocks in the selection.
 
-4.  **Generate Shapes:**
-    Create shapes at your current location.
+### 4. Clipboard and History
+Manage your copied selections and actions.
+-   **/copy**: Copies the selected region.
+-   **/paste**: Pastes the copied selection at your location.
+-   **/undo**: Reverts your last action.
+-   **/redo**: Restores the action you just undid.
 
-    -   **Spheres:**
-        Create a solid or hollow sphere.
-        ```
-        /sphere <block> <radius>
-        /hsphere <block> <radius>
-        ```
+### 5. Generating Shapes
+Create perfect geometric shapes.
+-   **/sphere `<block>` `<radius>`**: Creates a solid sphere.
+-   **/hsphere `<block>` `<radius>`**: Creates a hollow sphere.
+-   **/cyl `<block>` `<radius>` `[height]`**: Creates a solid cylinder.
+-   **/hcyl `<block>` `<radius>` `[height]`**: Creates a hollow cylinder.
 
-    -   **Cylinders:**
-        Create a solid or hollow cylinder. Height is optional and defaults to 1.
-        ```
-        /cyl <block> <radius> [height]
-        /hcyl <block> <radius> [height]
-        ```
+### 6. Schematics
+Save and load your creations.
+-   **/schem save `<name>`**: Saves the selection to `<name>.schem`.
+-   **/schem load `<name>`**: Loads a schematic file at your location.
+-   **/schem list**: Lists all available schematics.
 
-5.  **Use the Clipboard:**
+## Contributing
 
-    -   **Copy:**
-        Copy the blocks within the selection to your clipboard. The copy is relative to your position.
-        ```
-        /copy
-        ```
-
-    -   **Paste:**
-        Paste the copied blocks at your current location.
-        ```
-        /paste
-        ```
-
-6.  **Manage Schematics:**
-    Save and load structures to files.
-
-    -   **Save:**
-        Save the current selection to a `.schem` file.
-        ```
-        /schem save <name>
-        ```
-
-    -   **Load:**
-        Load a `.schem` file at your current position.
-        ```
-        /schem load <name>
-        ```
-
-    -   **List:**
-        List all available schematics.
-        ```
-        /schem list
-        ```
-
-7.  **Manage History:**
-
-    -   **Undo:**
-        Revert your last action (`/set`, `/replace`, `/walls`, `/overlay`, `/cut`, `/paste`, shape generation, or `/schem load`).
-        ```
-        /undo
-        ```
-
-    -   **Redo:**
-        Restore an action that you just undid.
-        ```
-        /redo
+Contributions are welcome! If you find a bug or have a feature request, please open an issue on the GitHub repository. If you would like to contribute code, please fork the repository and submit a pull request.

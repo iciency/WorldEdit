@@ -93,88 +93,32 @@ BEDROCK_TO_LEGACY_ID = {
 
 LEGACY_ID_TO_BEDROCK_NAME = {v: k for k, v in BEDROCK_TO_LEGACY_ID.items()}
 
-# --- New, more detailed translation system ---
-
-COLORS = [
-    "white", "orange", "magenta", "light_blue", "yellow", "lime", "pink",
-    "gray", "light_gray", "cyan", "purple", "blue", "brown", "green", "red", "black"
-]
-
-WOOD_TYPES = [
-    "oak", "spruce", "birch", "jungle", "acacia", "dark_oak", "crimson", "warped",
-    "mangrove", "cherry", "bamboo"
-]
-
-COLOR_TO_DATA = {color: i for i, color in enumerate(COLORS)}
-
-# Maps Java base names to Bedrock base names
-JAVA_TO_BEDROCK_BASE_MAP = {
-    "grass_block": "grass",
-    "cobblestone_stairs": "stone_stairs",
-    "rooted_dirt": "dirt",
-    "flowering_azalea_leaves": "azalea_leaves_flowered",
-    "oak_door": "wooden_door",
-    "oak_trapdoor": "trapdoor",
-    "oak_fence": "fence",
-    "oak_fence_gate": "fence_gate",
-    "oak_button": "wooden_button",
-    "oak_pressure_plate": "wooden_pressure_plate",
-    "oak_sign": "sign",
-    "oak_wall_sign": "wall_sign",
-    "terracotta": "hardened_clay",
-}
-
-# Bedrock block types that use data values for color
-COLOR_DATA_BLOCKS = {
-    "wool": "wool",
-    "carpet": "carpet",
-    "terracotta": "stained_hardened_clay",
-    "concrete": "concrete",
-    "concrete_powder": "concrete_powder",
-    "shulker_box": "shulker_box",
-    "bed": "bed",
-}
-
-def translate_block_name(java_name: str) -> tuple[str, int | None]:
+def translate_block_name(plugin, java_name: str) -> tuple[str, int | None]:
     """
     Translates a Java Edition block name to its Bedrock Edition equivalent,
     returning a tuple of (bedrock_name, data_value).
     """
     base_name = java_name.split('[')[0].replace("minecraft:", "")
 
-    # 1. Handle color-prefixed blocks
-    for color in COLORS:
-        if base_name.startswith(color + "_"):
-            block_type = base_name[len(color)+1:]
-            if block_type in COLOR_DATA_BLOCKS:
-                be_name = COLOR_DATA_BLOCKS[block_type]
-                return f"minecraft:{be_name}", COLOR_TO_DATA[color]
-            if "banner" in block_type:
-                be_name = "wall_banner" if "wall" in block_type else "standing_banner"
-                return f"minecraft:{be_name}", 15 - COLOR_TO_DATA[color]
-
-    # 2. Handle other patterned blocks
+    # 1. Check the direct mapping from config.json
+    if base_name in plugin.block_translation_map:
+        return f"minecraft:{plugin.block_translation_map[base_name]}", None
+    
+    # 2. Handle general patterns first
     if "potted_" in base_name:
         return "minecraft:flower_pot", None
-    if "_glazed_terracotta" in base_name:
-        return f"minecraft:{base_name}", None # BE name includes color
+    if "_bed" in base_name:
+        return "minecraft:bed", None # Data value for color is needed for BE
+    if "_banner" in base_name:
+        if "wall" in base_name:
+            return "minecraft:wall_banner", None
+        return "minecraft:standing_banner", None
+    if "sign" in base_name:
+        if "wall" in base_name:
+            return "minecraft:wall_sign", None
+        return "minecraft:standing_sign", None
 
-    # 3. Handle wood-prefixed blocks
-    for wood in WOOD_TYPES:
-        if base_name.startswith(wood + "_"):
-            # This is a simplification. A full implementation would need to handle
-            # wood types for stairs, slabs, fences, etc., which often have
-            # different data values in Bedrock Edition.
-            block_type = base_name[len(wood)+1:]
-            if block_type in ["log", "planks", "leaves"]: # Example handling
-                 # Placeholder: A real implementation needs a detailed map for wood data values
-                return f"minecraft:{block_type}", None
-
-    # 4. Check the direct mapping
-    if base_name in JAVA_TO_BEDROCK_BASE_MAP:
-        return f"minecraft:{JAVA_TO_BEDROCK_BASE_MAP[base_name]}", None
-
-    # 5. Return original name if no translation is found
+    # 3. Return original name if no translation is found
     return f"minecraft:{base_name}", None
 
 def command_executor(command_name, selection_required=False):

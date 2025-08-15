@@ -116,7 +116,7 @@ def handler(plugin, sender, args):
                     for x in range(width):
                         palette_index = read_varint(block_data_stream)
                         java_name = id_to_name.get(palette_index, "minecraft:air")
-                        block_name, data_value = translate_block_name(java_name)
+                        block_name, data_value = translate_block_name(plugin, java_name)
                         
                         if block_name != "minecraft:air":
                             # Ensure all coordinates are integers for precise placement
@@ -134,7 +134,7 @@ def handler(plugin, sender, args):
                     for x in range(width):
                         index = (y * length + z) * width + x
                         java_name = LEGACY_ID_TO_BEDROCK_NAME.get(str(block_ids[index]), "minecraft:air")
-                        block_name, data_value = translate_block_name(java_name)
+                        block_name, data_value = translate_block_name(plugin, java_name)
 
                         if block_name != "minecraft:air":
                             # Ensure all coordinates are integers for precise placement
@@ -170,16 +170,21 @@ def handler(plugin, sender, args):
 
         # Function to execute a pass
         def execute_pass(blocks_pass):
-            # We will handle async logic in the main plugin file's run_tasks
-            for x, y, z, block_type, data_value in blocks_pass:
-                block = dimension.get_block_at(x, y, z)
-                if data_value is not None:
-                    # This is a placeholder for a method that would set type and data.
-                    # We will need to modify the Block class in Endstone or find an alternative.
-                    # For now, we'll just set the type.
-                    block.set_type(block_type) 
-                else:
-                    block.set_type(block_type)
+            if len(blocks_pass) > plugin.plugin_config["async-threshold"]:
+                plugin.tasks[player_uuid] = {"dimension": dimension, "blocks": blocks_pass}
+                sender.send_message(f"Starting async operation for {len(blocks_pass)} blocks...")
+            else:
+                for x, y, z, block_type, data_value in blocks_pass:
+                    try:
+                        block = dimension.get_block_at(x, y, z)
+                        block.set_type(block_type)
+                        # if data_value is not None:
+                        #     # block.data = data_value # Endstone API is read-only
+                        #     pass
+                    except RuntimeError as e:
+                        plugin.logger.error(f"Skipping block '{block_type}' for player {sender.name}: {e}")
+                        sender.send_message(f"§cSkipped block: {block_type} ({e})§r")
+                        continue
 
         # Execute passes
         execute_pass(solid_pass)

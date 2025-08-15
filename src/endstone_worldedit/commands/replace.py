@@ -14,8 +14,8 @@ def handler(plugin, sender, args):
         sender.send_message("Usage: /replace <from_block> <to_block>")
         return False
 
-    from_block_name = args[0]
-    to_block_name = args[1]
+    from_block_name = args[0] if ":" in args[0] else f"minecraft:{args[0]}"
+    to_block_name = args[1] if ":" in args[1] else f"minecraft:{args[1]}"
 
     player_uuid = sender.unique_id
     pos1 = plugin.selections[player_uuid]['pos1']

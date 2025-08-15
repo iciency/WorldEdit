@@ -24,6 +24,7 @@ class WorldEditPlugin(Plugin):
         self.undo_history = {}
         self.redo_history = {}
         self.clipboard = {}
+        self.block_translation_map = {}
 
     def on_load(self):
         self.logger.info("WorldEditPlugin has been loaded!")
@@ -36,11 +37,74 @@ class WorldEditPlugin(Plugin):
 
     def load_config(self):
         config_path = "plugins/WorldEdit/config.json"
+        default_block_translation_map = {
+            "cobblestone_stairs": "stone_stairs",
+            "rooted_dirt": "dirt",
+            "flowering_azalea_leaves": "azalea_leaves_flowered",
+            "slime_block": "slime",
+            "sugar_cane": "reeds",
+            "small_dripleaf": "small_dripleaf_block",
+            "magma_block": "magma",
+            "lily_pad": "waterlily",
+            "dead_bush": "deadbush",
+            "snow_block": "snow",
+            "dirt_path": "grass_path",
+            "jack_o_lantern": "lit_pumpkin",
+            "melon": "melon_block",
+            "end_stone_bricks": "end_bricks",
+            "end_stone_brick_stairs": "end_brick_stairs",
+            "prismarine_brick_stairs": "prismarine_stairs",
+            "nether_bricks": "nether_brick",
+            "bricks": "brick_block",
+            "red_nether_bricks": "red_nether_brick",
+            "note_block": "noteblock",
+            "cobweb": "web",
+            "nether_quartz_ore": "quartz_ore",
+            "waxed_copper_block": "copper_block",
+            "repeater": "unpowered_repeater",
+            "comparator": "unpowered_comparator",
+            "powered_rail": "golden_rail",
+            "beetroots": "beetroot",
+            "oak_door": "wooden_door",
+            "oak_trapdoor": "trapdoor",
+            "oak_fence": "fence",
+            "oak_fence_gate": "fence_gate",
+            "oak_button": "wooden_button",
+            "oak_pressure_plate": "wooden_pressure_plate",
+            "oak_sign": "standing_sign",
+            "oak_wall_sign": "wall_sign",
+            "warped_sign": "standing_sign",
+            "warped_wall_sign": "wall_sign",
+            "crimson_sign": "standing_sign",
+            "crimson_wall_sign": "wall_sign",
+            "bamboo_sign": "standing_sign",
+            "bamboo_wall_sign": "wall_sign",
+            "cherry_sign": "standing_sign",
+            "cherry_wall_sign": "wall_sign",
+            "mangrove_sign": "standing_sign",
+            "mangrove_wall_sign": "wall_sign",
+            "jungle_sign": "standing_sign",
+            "jungle_wall_sign": "wall_sign",
+            "acacia_sign": "standing_sign",
+            "acacia_wall_sign": "wall_sign",
+            "dark_oak_sign": "standing_sign",
+            "dark_oak_wall_sign": "wall_sign",
+            "birch_sign": "standing_sign",
+            "birch_wall_sign": "wall_sign",
+            "spruce_sign": "standing_sign",
+            "spruce_wall_sign": "wall_sign",
+            "oak_wall_hanging_sign": "wall_sign",
+            "terracotta": "hardened_clay",
+            "light_gray_glazed_terracotta": "light_gray_concrete",
+            "dark_oak_standing_sign": "standing_sign",
+            "sign": "standing_sign",
+        }
         default_config = {
             "async-threshold": 5000,
             "particle-type": "minecraft:endrod",
             "particle-density-step": 5,
-            "schematic-path": "plugins/WorldEdit/schematics"
+            "schematic-path": "plugins/WorldEdit/schematics",
+            "block_translation_map": default_block_translation_map
         }
         
         if not os.path.exists(config_path):
@@ -51,12 +115,8 @@ class WorldEditPlugin(Plugin):
         else:
             with open(config_path, 'r') as f:
                 self.plugin_config = json.load(f)
-            # Ensure all keys are present
-            for key, value in default_config.items():
-                if key not in self.plugin_config:
-                    self.plugin_config[key] = value
-            with open(config_path, 'w') as f:
-                json.dump(self.plugin_config, f, indent=4)
+        
+        self.block_translation_map = self.plugin_config.get("block_translation_map", {})
 
     def on_enable(self):
         self.logger.info("WorldEditPlugin has been enabled!")
@@ -139,10 +199,11 @@ class WorldEditPlugin(Plugin):
                     #     # block.data = data_value  <- This is read-only in Endstone API
                     #     pass # Placeholder for a future method to set block data
                 except RuntimeError as e:
+                    self.logger.error(f"Skipping block '{block_type}' for player {player_uuid}: {e}")
                     player = self.server.get_player(player_uuid)
                     if player:
                         player.send_message(f"§cSkipped block: {block_type} ({e})§r")
-                    continue # Skip to the next block
+                    continue  # Skip to the next block
 
     def on_command(self, sender: CommandSender, command: Command, args: list[str]) -> bool:
         if command.name in self.handlers:
