@@ -23,18 +23,18 @@ def handler(plugin, sender, args):
 
     blocks_to_change = []
     copied_blocks = plugin.clipboard[player_uuid]
-    for relative_x, relative_y, relative_z, block_type in copied_blocks:
+    for relative_x, relative_y, relative_z, block_type, data_value in copied_blocks:
         target_x = int(player_location.x + relative_x)
         target_y = int(player_location.y + relative_y)
         target_z = int(player_location.z + relative_z)
-        blocks_to_change.append((target_x, target_y, target_z, block_type))
+        blocks_to_change.append((target_x, target_y, target_z, block_type, data_value))
 
     affected_blocks = len(blocks_to_change)
 
     # Store undo history first
-    for x, y, z, _ in blocks_to_change:
+    for x, y, z, _, _ in blocks_to_change:
         block = dimension.get_block_at(x, y, z)
-        undo_entry.append((x, y, z, block.type))
+        undo_entry.append((x, y, z, block.type, block.data))
 
     if player_uuid not in plugin.undo_history:
         plugin.undo_history[player_uuid] = []
@@ -45,8 +45,10 @@ def handler(plugin, sender, args):
         plugin.tasks[player_uuid] = {"dimension": dimension, "blocks": blocks_to_change}
         sender.send_message(f"Starting async operation for {affected_blocks} blocks...")
     else:
-        for x, y, z, type in blocks_to_change:
+        for x, y, z, block_type, data_value in blocks_to_change:
             block = dimension.get_block_at(x, y, z)
-            block.set_type(type)
+            block.set_type(block_type)
+            if data_value is not None:
+                block.data = data_value
         sender.send_message(f"Operation complete ({affected_blocks} blocks affected).")
     return True

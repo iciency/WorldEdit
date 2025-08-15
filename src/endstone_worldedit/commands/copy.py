@@ -32,7 +32,7 @@ def handler(plugin, sender, args):
                 relative_x = x - player_location.x
                 relative_y = y - player_location.y
                 relative_z = z - player_location.z
-                blocks.append((relative_x, relative_y, relative_z, block.type))
+                blocks.append((relative_x, relative_y, relative_z, block.type, block.data))
 
     plugin.clipboard[player_uuid] = blocks
     sender.send_message(f"{len(blocks)} blocks copied.")

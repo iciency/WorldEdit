@@ -34,13 +34,13 @@ def handler(plugin, sender, args):
         for y in range(int(center.y) - radius, int(center.y) + radius + 1):
             for z in range(int(center.z) - radius, int(center.z) + radius + 1):
                 if math.sqrt((x - center.x)**2 + (y - center.y)**2 + (z - center.z)**2) <= radius:
-                    blocks_to_change.append((x, y, z, block_name))
+                    blocks_to_change.append((x, y, z, block_name, None))
 
     affected_blocks = len(blocks_to_change)
 
-    for x, y, z, _ in blocks_to_change:
+    for x, y, z, _, _ in blocks_to_change:
         block = dimension.get_block_at(x, y, z)
-        undo_entry.append((x, y, z, block.type))
+        undo_entry.append((x, y, z, block.type, block.data))
 
     if player_uuid not in plugin.undo_history:
         plugin.undo_history[player_uuid] = []
@@ -50,9 +50,11 @@ def handler(plugin, sender, args):
         plugin.tasks[player_uuid] = {"dimension": dimension, "blocks": blocks_to_change}
         sender.send_message(f"Starting async operation for {affected_blocks} blocks...")
     else:
-        for x, y, z, type in blocks_to_change:
+        for x, y, z, block_type, data_value in blocks_to_change:
             block = dimension.get_block_at(x, y, z)
-            block.set_type(type)
+            block.set_type(block_type)
+            if data_value is not None:
+                block.data = data_value
         sender.send_message(f"Operation complete ({affected_blocks} blocks affected).")
         
     return True

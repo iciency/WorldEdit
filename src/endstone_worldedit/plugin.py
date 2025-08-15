@@ -125,11 +125,19 @@ class WorldEditPlugin(Plugin):
                     if not blocks_to_change:
                         break
                     block_data = blocks_to_change.pop(0)
-                    x, y, z, block_type, data_value = block_data
+                    
+                    # Handle both 4-value and 5-value tuples for compatibility
+                    if len(block_data) == 5:
+                        x, y, z, block_type, data_value = block_data
+                    else:
+                        x, y, z, block_type = block_data
+                        data_value = None
+
                     block = dimension.get_block_at(x, y, z)
                     block.set_type(block_type)
-                    if data_value is not None:
-                        block.data = data_value
+                    # if data_value is not None:
+                    #     # block.data = data_value  <- This is read-only in Endstone API
+                    #     pass # Placeholder for a future method to set block data
                 except RuntimeError as e:
                     player = self.server.get_player(player_uuid)
                     if player:

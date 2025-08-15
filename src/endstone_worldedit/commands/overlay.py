@@ -40,14 +40,14 @@ def handler(plugin, sender, args):
                         target_block = dimension.get_block_at(x, y + 1, z)
                         # Only overlay if the block above is air, to avoid filling caves
                         if target_block.type == "minecraft:air":
-                            blocks_to_change.append((x, y + 1, z, block_name))
+                            blocks_to_change.append((x, y + 1, z, block_name, None))
                     break  # Move to the next (x, z) column
 
     affected_blocks = len(blocks_to_change)
 
-    for x, y, z, _ in blocks_to_change:
+    for x, y, z, _, _ in blocks_to_change:
         block = dimension.get_block_at(x, y, z)
-        undo_entry.append((x, y, z, block.type))
+        undo_entry.append((x, y, z, block.type, block.data))
 
     if player_uuid not in plugin.undo_history:
         plugin.undo_history[player_uuid] = []
@@ -57,9 +57,11 @@ def handler(plugin, sender, args):
         plugin.tasks[player_uuid] = {"dimension": dimension, "blocks": blocks_to_change}
         sender.send_message(f"Starting async operation for {affected_blocks} blocks...")
     else:
-        for x, y, z, type in blocks_to_change:
+        for x, y, z, block_type, data_value in blocks_to_change:
             block = dimension.get_block_at(x, y, z)
-            block.set_type(type)
+            block.set_type(block_type)
+            if data_value is not None:
+                block.data = data_value
         sender.send_message(f"Operation complete ({affected_blocks} blocks affected).")
         
     return True

@@ -22,9 +22,9 @@ def handler(plugin, sender, args):
     
     # Prepare undo entry
     undo_entry = []
-    for x, y, z, _ in last_action:
+    for x, y, z, _, _ in last_action:
         block = dimension.get_block_at(x, y, z)
-        undo_entry.append((x, y, z, block.type))
+        undo_entry.append((x, y, z, block.type, block.data))
 
     # Add to undo history
     if player_uuid not in plugin.undo_history:
@@ -32,9 +32,12 @@ def handler(plugin, sender, args):
     plugin.undo_history[player_uuid].append(undo_entry)
 
     # Restore blocks
-    for x, y, z, block_type in last_action:
+    for x, y, z, block_type, data_value in last_action:
         block = dimension.get_block_at(x, y, z)
         block.set_type(block_type)
+        # if data_value is not None:
+        #     # block.data = data_value # Endstone API is read-only
+        #     pass
 
     sender.send_message("Last action redone.")
     return True
