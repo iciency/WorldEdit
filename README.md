@@ -72,6 +72,8 @@ Define the area you want to edit.
 -   **Left-Click** a block with the wand to set **Position 1**.
 -   **Right-Click** a block with the wand to set **Position 2**.
 -   **/pos1** & **/pos2**: Sets your current location as Position 1 or 2.
+-   **/sel clear** (Alias: `/deselect`): Clears your current selection.
+-   **/sel toggle**: Toggles the selection particle outline on or off for you.
 
 ### 3. Editing the World
 Modify the blocks within your selection.

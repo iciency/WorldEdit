@@ -25,6 +25,7 @@ class WorldEditPlugin(Plugin):
         self.redo_history = {}
         self.clipboard = {}
         self.block_translation_map = {}
+        self.particle_toggle = {}  # Stores player UUID -> bool
 
     def on_load(self):
         self.logger.info("WorldEditPlugin has been loaded!")
@@ -128,6 +129,10 @@ class WorldEditPlugin(Plugin):
 
     def show_selection_particles(self):
         for player_uuid, selection in self.selections.items():
+            # Check if particles are enabled for this player
+            if not self.particle_toggle.get(player_uuid, True):
+                continue
+
             if "pos1" in selection and "pos2" in selection:
                 player = self.server.get_player(player_uuid)
                 if player:
