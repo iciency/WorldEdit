@@ -17,7 +17,11 @@ def read_varint(stream):
 command = {
     "schem": {
         "description": "Manages schematics (Modern & Legacy).",
-        "usages": ["/schem <save|load|list> <name: string>"],
+        "usages": [
+            "/schem save <name: string>",
+            "/schem load <name: string>",
+            "/schem list"
+        ],
         "permissions": ["worldedit.command.schem"]
     }
 }
@@ -30,6 +34,17 @@ def handler(plugin, sender, args):
 
     sub_command = args[0].lower()
     schematic_path = plugin.plugin_config.get("schematic-path", "plugins/WorldEdit/schematics")
+
+    if sub_command == "list":
+        if not os.path.exists(schematic_path):
+            sender.send_message("Schematic directory not found.")
+            return False
+        files = [f.replace('.schem', '') for f in os.listdir(schematic_path) if f.endswith('.schem')]
+        if not files:
+            sender.send_message("No schematics found.")
+        else:
+            sender.send_message("Available schematics: " + ", ".join(files))
+        return True
 
     if sub_command == "save":
         if len(args) < 2:
@@ -191,17 +206,6 @@ def handler(plugin, sender, args):
         execute_pass(dependent_pass)
 
         sender.send_message(f"Operation complete ({len(blocks_to_change)} blocks affected).")
-        return True
-
-    elif sub_command == "list":
-        if not os.path.exists(schematic_path):
-            sender.send_message("Schematic directory not found.")
-            return False
-        files = [f.replace('.schem', '') for f in os.listdir(schematic_path) if f.endswith('.schem')]
-        if not files:
-            sender.send_message("No schematics found.")
-        else:
-            sender.send_message("Available schematics: " + ", ".join(files))
         return True
 
     sender.send_message(f"Unknown sub-command '{sub_command}'. Use save, load, or list.")
