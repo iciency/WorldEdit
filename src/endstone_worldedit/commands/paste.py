@@ -48,7 +48,8 @@ def handler(plugin, sender, args):
         for x, y, z, block_type, data_value in blocks_to_change:
             block = dimension.get_block_at(x, y, z)
             block.set_type(block_type)
-            if data_value is not None:
-                block.data = data_value
+            # if data_value is not None:
+            #     # block.data = data_value # Endstone API is read-only
+            #     pass
         sender.send_message(f"Operation complete ({affected_blocks} blocks affected).")
     return True
