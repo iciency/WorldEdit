@@ -57,7 +57,7 @@ Upon first launch, the plugin will create a `config.json` file in `plugins/World
 
 -   **`async-threshold`**: The number of blocks at which an operation will be processed in smaller chunks to prevent server lag.
 -   **`particle-type`**: The particle used to visualize the selection box.
--   **`block_translation_map`**: A powerful feature for resolving compatibility issues when loading Java Edition schematics. If a schematic fails to load because a block name isn't found (e.g., Java's `minecraft:slime_block`), you can add an entry here to translate it to the correct Bedrock name (e.g., `"slime_block": "slime"`).
+-   **`block_translation_map`**: A powerful feature for resolving compatibility issues when loading Java Edition schematics. If a schematic fails to load because a block name isn't found (e.g., Java's `minecraft:slime_block`), you can add an entry here to translate it to the correct Bedrock name (e.g., `"slime_block": "slime"`). You can add, remove, or modify these rules at any time to handle new or custom block types.
 
 ## Usage Guide
 
@@ -67,11 +67,12 @@ Upon first launch, the plugin will create a `config.json` file in `plugins/World
 First, give yourself the selection tool.
 -   **/wand** (Alias: `/w`): Gives you a wooden axe to use as the selection wand.
 
-### 2. Selecting a Region
-Define the area you want to edit.
+### 2. Selecting and Managing a Region
+Define and manage the area you want to edit.
 -   **Left-Click** a block with the wand to set **Position 1**.
 -   **Right-Click** a block with the wand to set **Position 2**.
 -   **/pos1** & **/pos2**: Sets your current location as Position 1 or 2.
+-   **/sel**: Provides information about the current selection (size, block count).
 -   **/sel clear** (Alias: `/deselect`): Clears your current selection.
 -   **/sel toggle**: Toggles the selection particle outline on or off for you.
 
