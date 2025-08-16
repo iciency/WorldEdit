@@ -216,7 +216,7 @@ class WorldEditPlugin(Plugin):
         player = event.player
         item = player.inventory.item_in_main_hand
         if item is not None and item.type == "minecraft:wooden_axe":
-            event.cancelled = True
+            event.cancel()
             player_uuid = player.unique_id
             if player_uuid not in self.selections:
                 self.selections[player_uuid] = {}
