@@ -52,6 +52,6 @@ def handler(plugin, sender, args):
             block = dimension.get_block_at(x, y, z)
             block.set_type(block_type)
             if data_value is not None:
-                block.data = data_value
+                block.set_data(data_value)
         sender.send_message(f"Operation complete ({affected_blocks} blocks affected).")
     return True

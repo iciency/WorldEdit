@@ -200,9 +200,8 @@ class WorldEditPlugin(Plugin):
 
                     block = dimension.get_block_at(x, y, z)
                     block.set_type(block_type)
-                    # if data_value is not None:
-                    #     # block.data = data_value  <- This is read-only in Endstone API
-                    #     pass # Placeholder for a future method to set block data
+                    if data_value is not None:
+                        block.set_data(data_value) # Assuming data_value is the saved block data
                 except RuntimeError as e:
                     self.logger.error(f"Skipping block '{block_type}' for player {player_uuid}: {e}")
                     player = self.server.get_player(player_uuid)
