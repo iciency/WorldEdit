@@ -27,7 +27,7 @@ A powerful and intuitive WorldEdit-like plugin for the Endstone Minecraft server
     This will create a `.whl` file in the `dist/` folder.
 
 2.  **Install the Plugin:**
-    Copy the generated `.whl` file (e.g., `dist/endstone_worldedit-2.0.1-py3-none-any.whl`) into your Endstone server's `plugins/` folder.
+    Copy the generated `.whl` file (e.g., `dist/endstone_worldedit-2.0.2-py3-none-any.whl`) into your Endstone server's `plugins/` folder.
 
 3.  **Restart the Server:**
     Start or restart your Endstone server to load the plugin and generate the default configuration.
